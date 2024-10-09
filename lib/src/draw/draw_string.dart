@@ -4,10 +4,14 @@ import '../font/bitmap_font.dart';
 import '../image/image.dart';
 import 'draw_pixel.dart';
 
+enum TextAlignHorizontal { left, right, center }
+enum TextAlignVertical { top, bottom, center }
+
 /// Draw a string horizontally into [image] horizontally into [image] at
 /// position [x],[y] with the given [color].
-/// If [x] is not specified, the string will be centered horizontally.
-/// If [y] is not specified, the string will be centered vertically.
+/// If [x] and horizontalAlignment is not specified, the string will be centered horizontally.
+/// If [y] and verticalAlignment is not specified, the string will be centered vertically.
+/// Using horizontal and vertical alignment you can define where the text is anchored (left, center right). The default is top left.
 ///
 /// You can load your own font, or use one of the existing ones
 /// such as: arial14, arial24, or arial48.
@@ -20,7 +24,10 @@ Image drawString(Image image, String string,
     bool rightJustify = false,
     bool wrap = false,
     Image? mask,
-    Channel maskChannel = Channel.luminance}) {
+    Channel maskChannel = Channel.luminance,
+    TextAlignHorizontal? horizontalAlignment,
+    TextAlignVertical? verticalAlignment,
+    }) {
   if (color?.a == 0) {
     return image;
   }
@@ -40,8 +47,44 @@ Image drawString(Image image, String string,
     }
   }
 
-  var sx = x ?? (image.width / 2).round() - (stringWidth / 2).round();
-  var sy = y ?? (image.height / 2).round() - (stringHeight / 2).round();
+  
+  if(x == null && horizontalAlignment == null) {
+    horizontalAlignment = TextAlignHorizontal.center;
+  }
+
+  if(y == null && verticalAlignment == null) {
+    verticalAlignment = TextAlignVertical.center;
+  }
+
+  switch (horizontalAlignment) {
+    default:
+    case TextAlignHorizontal.left:
+      sx ??= 0;
+      break;
+    case TextAlignHorizontal.right:
+      sx ??= image.width;
+      sx = sx - stringWidth;
+      break;
+    case TextAlignHorizontal.center:
+      sx ??= image.width ~/ 2;
+      sx = sx - (stringWidth / 2).round();
+      break;
+  }
+
+  switch (verticalAlignment) {
+    default:
+    case TextAlignVertical.top:
+      sy ??= 0;
+      break;
+    case TextAlignVertical.bottom:
+      sy ??= image.height;
+      sy = sy - stringHeight;
+      break;
+    case TextAlignVertical.center:
+      sy ??= image.height ~/ 2;
+      sy = sy - (stringHeight / 2).round();
+      break;
+  }
 
   if (wrap) {
     final sentences = string.split(RegExp(r'\n'));
