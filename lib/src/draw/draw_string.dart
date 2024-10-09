@@ -5,6 +5,7 @@ import '../image/image.dart';
 import 'draw_pixel.dart';
 
 enum TextAlignHorizontal { left, right, center }
+
 enum TextAlignVertical { top, bottom, center }
 
 /// Draw a string horizontally into [image] horizontally into [image] at
@@ -16,18 +17,20 @@ enum TextAlignVertical { top, bottom, center }
 /// You can load your own font, or use one of the existing ones
 /// such as: arial14, arial24, or arial48.
 ///  Fonts can be create with a tool such as: https://ttf2fnt.com/
-Image drawString(Image image, String string,
-    {required BitmapFont font,
-    int? x,
-    int? y,
-    Color? color,
-    bool rightJustify = false,
-    bool wrap = false,
-    Image? mask,
-    Channel maskChannel = Channel.luminance,
-    TextAlignHorizontal? horizontalAlignment,
-    TextAlignVertical? verticalAlignment,
-    }) {
+Image drawString(
+  Image image,
+  String string, {
+  required BitmapFont font,
+  int? x,
+  int? y,
+  Color? color,
+  bool rightJustify = false,
+  bool wrap = false,
+  Image? mask,
+  Channel maskChannel = Channel.luminance,
+  TextAlignHorizontal? horizontalAlignment,
+  TextAlignVertical? verticalAlignment,
+}) {
   if (color?.a == 0) {
     return image;
   }
@@ -47,42 +50,43 @@ Image drawString(Image image, String string,
     }
   }
 
-  
-  if(x == null && horizontalAlignment == null) {
+  if (x == null && horizontalAlignment == null) {
     horizontalAlignment = TextAlignHorizontal.center;
   }
 
-  if(y == null && verticalAlignment == null) {
+  if (y == null && verticalAlignment == null) {
     verticalAlignment = TextAlignVertical.center;
   }
 
+  int sx;
   switch (horizontalAlignment) {
-    default:
-    case TextAlignHorizontal.left:
-      sx ??= 0;
-      break;
     case TextAlignHorizontal.right:
-      sx ??= image.width;
+      sx = x ?? image.width;
       sx = sx - stringWidth;
       break;
     case TextAlignHorizontal.center:
-      sx ??= image.width ~/ 2;
+      sx = x ?? image.width ~/ 2;
       sx = sx - (stringWidth / 2).round();
+      break;
+    case TextAlignHorizontal.left:
+    default:
+      sx = x ?? 0;
       break;
   }
 
+  int sy;
   switch (verticalAlignment) {
-    default:
-    case TextAlignVertical.top:
-      sy ??= 0;
-      break;
     case TextAlignVertical.bottom:
-      sy ??= image.height;
+      sy = y ?? image.height;
       sy = sy - stringHeight;
       break;
     case TextAlignVertical.center:
-      sy ??= image.height ~/ 2;
+      sy = y ?? image.height ~/ 2;
       sy = sy - (stringHeight / 2).round();
+      break;
+    case TextAlignVertical.top:
+    default:
+      sy = y ?? 0;
       break;
   }
 
